@@ -30,6 +30,7 @@ class Orders with ChangeNotifier {
       products: cartProducts,
       
     ));
+    notifyListeners();
 
   }
 
