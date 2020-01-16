@@ -6,12 +6,12 @@ import '../widgets/app_drawer.dart';
 import '../providers/products_provider.dart';
 import '../widgets/user_product_item.dart';
 
-
 class UserProductsScreen extends StatelessWidget {
   static const routeName = '/user-products';
 
   @override
   Widget build(BuildContext context) {
+    
     final productsData = Provider.of<Products>(context);
     return Scaffold(
       appBar: AppBar(
@@ -33,8 +33,7 @@ class UserProductsScreen extends StatelessWidget {
           itemBuilder: (_, i) {
             return Column(
               children: <Widget>[
-                UserProductItem(    
-                  id: productsData.items[i].id,              
+                UserProductItem(
                   title: productsData.items[i].title,
                   imageUrl: productsData.items[i].imageUrl,
                 ),

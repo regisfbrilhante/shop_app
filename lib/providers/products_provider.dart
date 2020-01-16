@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
 import './product.dart';
 
 class Products with ChangeNotifier {
@@ -36,62 +40,74 @@ class Products with ChangeNotifier {
           'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
     ),
   ];
-
   // var _showFavoritesOnly = false;
-
-  // void showFavoritesOnly () {
-  //   _showFavoritesOnly = true;
-  //   notifyListeners();
-  // }
-
-  // void showAll(){
-  //   _showFavoritesOnly = false;
-  //   notifyListeners();
-  // }
 
   List<Product> get items {
     // if (_showFavoritesOnly) {
-    //   return _items.where((prodItem) => prodItem.isFavorite == true).toList();
+    //   return _items.where((prodItem) => prodItem.isFavorite).toList();
     // }
-
     return [..._items];
   }
 
   List<Product> get favoriteItems {
-    return _items.where((product) => product.isFavorite == true).toList();
-  }
-
-  void updateProduct(String id, Product newProduct) {
-    final prodIndex = _items.indexWhere((prod) => prod.id == id);
-    if (prodIndex >= 0 ) {
-      _items[prodIndex] = newProduct;
-      notifyListeners();
-    } else {
-      print('exemplo.......');
-    };
-    notifyListeners();
-  }
-
-  void addProduct(Product product) {
-    final newProduct = Product(
-      description: product.description,
-      price: product.price,
-      imageUrl: product.imageUrl,
-      title: product.title,
-      isFavorite: product.isFavorite,
-      id: DateTime.now().toString(),
-    );
-    _items.add(newProduct);
-    // ou _items.insert(0, newProduct);
-
-    notifyListeners();
+    return _items.where((prodItem) => prodItem.isFavorite).toList();
   }
 
   Product findById(String id) {
     return _items.firstWhere((prod) => prod.id == id);
   }
 
-  void deleteProduct(String id){
+  // void showFavoritesOnly() {
+  //   _showFavoritesOnly = true;
+  //   notifyListeners();
+  // }
+
+  // void showAll() {
+  //   _showFavoritesOnly = false;
+  //   notifyListeners();
+  // }
+
+  Future<void> addProduct(Product product) {
+    const url = 'https://flutter-update.firebaseio.com/products.json';
+    return http
+        .post(
+      url,
+      body: json.encode({
+        'title': product.title,
+        'description': product.description,
+        'imageUrl': product.imageUrl,
+        'price': product.price,
+        'isFavorite': product.isFavorite,
+      }),
+    )
+        .then((response) {
+      final newProduct = Product(
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl,
+        id: json.decode(response.body)['name'],
+      );
+      _items.add(newProduct);
+      // _items.insert(0, newProduct); // at the start of the list
+      notifyListeners();
+    }).catchError((error) {
+      print(error);
+      throw error;
+    });
+  }
+
+  void updateProduct(String id, Product newProduct) {
+    final prodIndex = _items.indexWhere((prod) => prod.id == id);
+    if (prodIndex >= 0) {
+      _items[prodIndex] = newProduct;
+      notifyListeners();
+    } else {
+      print('...');
+    }
+  }
+
+  void deleteProduct(String id) {
     _items.removeWhere((prod) => prod.id == id);
     notifyListeners();
   }
