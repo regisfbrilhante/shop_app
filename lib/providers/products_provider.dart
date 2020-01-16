@@ -40,8 +40,8 @@ class Products with ChangeNotifier {
   // var _showFavoritesOnly = false;
 
   // void showFavoritesOnly () {
-  //   _showFavoritesOnly = true; 
-  //   notifyListeners();   
+  //   _showFavoritesOnly = true;
+  //   notifyListeners();
   // }
 
   // void showAll(){
@@ -61,11 +61,38 @@ class Products with ChangeNotifier {
     return _items.where((product) => product.isFavorite == true).toList();
   }
 
-  void addProduct() {
+  void updateProduct(String id, Product newProduct) {
+    final prodIndex = _items.indexWhere((prod) => prod.id == id);
+    if (prodIndex >= 0 ) {
+      _items[prodIndex] = newProduct;
+      notifyListeners();
+    } else {
+      print('exemplo.......');
+    };
+    notifyListeners();
+  }
+
+  void addProduct(Product product) {
+    final newProduct = Product(
+      description: product.description,
+      price: product.price,
+      imageUrl: product.imageUrl,
+      title: product.title,
+      isFavorite: product.isFavorite,
+      id: DateTime.now().toString(),
+    );
+    _items.add(newProduct);
+    // ou _items.insert(0, newProduct);
+
     notifyListeners();
   }
 
   Product findById(String id) {
     return _items.firstWhere((prod) => prod.id == id);
+  }
+
+  void deleteProduct(String id){
+    _items.removeWhere((prod) => prod.id == id);
+    notifyListeners();
   }
 }
